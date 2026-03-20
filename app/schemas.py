@@ -30,7 +30,7 @@ class TaskResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     title: str
-    decription: str
+    description: str
     completed: bool
     due_date: datetime
     created_at: datetime
