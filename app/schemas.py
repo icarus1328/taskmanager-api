@@ -7,10 +7,12 @@ class UserCreate(BaseModel):
     email: str
     
 class UserResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     username: str
     email: str
-
+    
+    
 class TaskCreate(BaseModel):
     title: str
     completed: bool
@@ -18,12 +20,13 @@ class TaskCreate(BaseModel):
     user_id: int
     
 class TaskUpdate(BaseModel):
-    title: str
+    title: Optional[str] = None
     description: Optional[str] = None
-    completed: bool
-    due_date: datetime
+    completed: Optional[bool] = None
+    due_date: Optional[datetime] = None
     
 class TaskResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     title: str
     decription: str
@@ -32,6 +35,4 @@ class TaskResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     user_id: int
-    
-class config:
-    from_attributes = True
+
