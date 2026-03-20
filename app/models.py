@@ -11,7 +11,7 @@ class User(Base):
     username = Column(String(50), nullable=False, unique=True)
     email    = Column(String(100), nullable=False, unique=True)
     
-    tasks = relationship("Tasks", back_populates="author")
+    tasks = relationship("Tasks", back_populates="author", cascade="all, delete-orphan") #when a user is deleted it automatically deletes related tasks instead of setting user id to NULL
     
     def __repr__(self):
         return f"<User ID: {self.user_id} Username: {self.username}"
