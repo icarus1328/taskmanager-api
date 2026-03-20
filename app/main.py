@@ -16,3 +16,60 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+#UserResponse
+@app.get('/users/{user_id}', response_model=schemas.UserResponse)
+def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User Not Found!")
+    return user
+
+#UserResponse
+@app.get('/users', response_model=list[schemas.UserResponse])
+def get_users(db: Session=Depends(get_db)):
+    users = db.query(models.User).all()
+    return users
+
+#TaskCreate
+@app.post('/tasks', response_model=schemas.TaskCreate)
+def create_task(task: schemas.TaskCreate, db: Session=Depends(get_db)):
+    if db.query(models.Tasks).filter(models.Tasks.title == task.title, models.Tasks.user_id == task.user_id).first():
+        raise HTTPException(status_code=400, detail="Task already exists!")
+    db_task=models.Tasks(title=task.title, description=task.description, completed=task.completed, due_date=task.due_date, user_id=task.user_id)
+    db.add(db_task)
+    db.commit()
+    db.refresh(db_task)
+    
+    return db_task
+
+#TaskResponse
+@app.get('/tasks/user/{userid}',response_model=list[schemas.TaskResponse])
+def get_tasks_by_userid(userid:int, db: Session=Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == userid).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User Not Found!")
+    db_tasks= user.tasks
+    return db_tasks
+
+#TaskResponse
+@app.get('/tasks/{task_id}', response_model=schemas.TaskResponse)
+def get_task_by_id(task_id:int, db: Session=Depends(get_db)):
+    task = db.query(models.Tasks).filter(models.Tasks.id == task_id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail="Task Not Found!")
+    return task
+
+#TaskUpdate
+@app.patch('/tasks/{task_id}',response_model=schemas.TaskResponse)
+def update_task(task_id: int, task_update: schemas.TaskUpdate, db: Session=Depends(get_db)):
+    task = db.query(models.Tasks).filter(models.Tasks.id == task_id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail="Task Not Found!")
+    
+    for field, value in task_update.model_dump(exclude_unset=True).items():
+        setattr(task, field, value)
+    db.commit()
+    db.refresh(task)
+    
+    return task
