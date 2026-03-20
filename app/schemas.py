@@ -15,6 +15,7 @@ class UserResponse(BaseModel):
     
 class TaskCreate(BaseModel):
     title: str
+    description: Optional[str] = None
     completed: bool
     due_date: datetime
     user_id: int
